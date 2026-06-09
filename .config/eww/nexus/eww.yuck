@@ -1,3 +1,4 @@
+(defvar current_nexus 0)
 (defvar is_nexus_open false)
 (defpoll current_volume :interval "1s" :initial "0" :run-while is_nexus_open `wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print $2 * 100}'`)
 (defpoll current_brightness :interval "1s" :initial "0" :run-while is_nexus_open `brightnessctl -m | awk -F, '{gsub(/%/, \"\", $4); print $4}'`)
@@ -6,7 +7,8 @@
 (deflisten musicb :initial "{}" :run-while is_nexus_open `./scripts/music.sh b`)
 
 (defwidget btn [icon ?class tooltip onclick]
-           (eventbox :cursor "pointer"
+           (eventbox :class "btn-container"
+                     :cursor "pointer"
                      :tooltip tooltip
                      :onclick onclick
                      (label :class {class?:"kanjuts"} :text icon)
@@ -128,6 +130,19 @@
            )
 
 
+(defwidget nexus_main []
+           (box :class "nexus-container"
+                :orientation "v"
+                :space-evenly false
+                (clock)
+                (slider)
+                (music_player)
+                (applications)
+                (power_buttons)
+
+                )
+           )
+
 (defwindow nexus_win
            :monitor 0
            :namespace "nexus-win"
@@ -142,30 +157,16 @@
                 (revealer :transition "slideleft"
                           :reveal is_nexus_open
                           :duration "350ms"
-                          (eventbox ;:onhoverlost "./scripts/nexus.sh"
-                            ;(rmenu)
-                            (box :class "nexus-container"
-                                 :orientation "v"
-                                 :space-evenly false
-                                 (clock)
-                                 (slider)
-                                 (music_player)
-                                 (applications)
-                                 (power_buttons)
-                                 )
-                            )
+                          (nexus_main)
                           )
                 )
            )
 
-(defwidget menuctl []
-           (box :class "menuctl"
-                :tooltip "etc..."
-                (eventbox 
-                  :onclick "./scripts/nexus.sh"
-                  (label :text " ")
-                  )
-                )
+(defwidget nexus []
+           (eventbox :class "nexus" :cursor "pointer"
+                     :onclick "./scripts/nexus.sh"
+                     (label :text " ")
+                     )
            )
 
 ; vim: ft=lisp:nowrap

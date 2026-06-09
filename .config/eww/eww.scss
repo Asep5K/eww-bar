@@ -4,7 +4,7 @@ $accent: #8839ef;
 $bg-menu: rgba(239, 241, 245, 0.7);
 
 @import "./nexus/eww.scss";
-
+@import "./workspace/eww.scss";
 
 * {
     font-family: "UbuntuMono Nerd Font", sans-serif;
@@ -32,16 +32,4 @@ $bg-menu: rgba(239, 241, 245, 0.7);
 .ram {
     padding-right: 12px;
     font-weight: bold;
-}
-
-.work label {
-    font-size: 15px;
-    color: $text;
-    margin: 2px 4px;
-}
-
-.workspace-container {
-    background-color: $bg-menu;
-    border-radius: 12px;
-    border: 1px solid $accent;
 }

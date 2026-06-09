@@ -1,0 +1,47 @@
+(defvar img_path "../hypr/wallpaper/1.jpg")
+(defvar is_hover false)
+
+
+(defwidget workspace_button [num]
+           (eventbox :cursor "pointer"
+                     :onscroll "./scripts/workspace.sh {}"
+                     :onclick "hyprctl dispatch 'hl.dsp.focus({ workspace = ${num} })'"
+                     :onhover "eww update is_hover=true && ./scripts/hover.sh ${num}"
+                     :onhoverlost "eww update is_hover=false"
+                     (box :class "work"
+                          :spacing 5
+                          :space-evenly false
+                          (label :text "${active_workspace == num ? " ": " "}")
+                          )
+                     )
+           )
+
+(defwidget workspaces []
+           (box :class "workspace-container"
+                :spacing 5
+                (workspace_button :num 1)
+                (workspace_button :num 2)
+                (workspace_button :num 3)
+                (workspace_button :num 4)
+                (workspace_button :num 5)
+                )
+           )
+
+(defwindow workspace_hover
+           :monitor 0
+           :namespace "works"
+           :stacking "overlay"
+           :geometry (geometry :anchor "bottom center"
+                               :y "5px"
+                               ;:width "200px"
+                               ;:height "120px"
+                               )
+           (revealer :transition "slideup"
+                     :reveal is_hover
+                     :duration "250ms"
+                     (box :class "workspace-img" :orientation "v"
+                          :style "background-image: url('${img_path}')")
+                     )
+           )
+
+;; vim: ft=lisp:nowrap
