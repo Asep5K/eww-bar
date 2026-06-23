@@ -48,13 +48,14 @@ eww -c ~/.config/eww/left-bar open bar
 ### [left-bar](./eww/left-bar)
 *Looking for my full system configuration? Check out my main dotfiles on [Codeberg](https://codeberg.org/Asep5K/dotfs).*
 
-<table align="left" border="0" cellpadding="0" cellspacing="0">
+<table>
   <tr>
-    <td valign="top">
-      <img src="https://codeberg.org/Asep5K/dotfs/raw/branch/main/assets/bar.webp" alt="Niri Bar" style="width: 50px; height: 350px; object-fit: cover; display: block;">
+    <td>
+      <img src="https://codeberg.org/Asep5K/dotfs/raw/branch/main/assets/bar.webp" alt="Niri Bar" height="350">
     </td>
-    <td valign="top" style="padding-left: 10px;">
-      <img src="https://codeberg.org/Asep5K/dotfs/raw/branch/main/assets/a.png" alt="aji pisang" style="height: 350px; width: auto; display: block;">
+    <td>
+      <img src="https://codeberg.org/Asep5K/dotfs/raw/branch/main/assets/a.png" alt="aji pisang" height="350">
     </td>
   </tr>
 </table>
+
