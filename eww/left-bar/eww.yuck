@@ -1,0 +1,249 @@
+;; >> NOTES <<
+
+;; For readers or anyone who wants to learn from this code:
+;; Currently, this code is only understood by me and God (if you believe in God's existence).
+;; If you want to learn EWW, please look for other code that is easier to read.
+
+
+(defwidget foo [class onhover ?onclick onhoverlost reveal value onchange text tooltip]
+           (eventbox :class `${class}`
+                     :cursor `pointer`
+                     :onhover onhover
+                     :onhoverlost onhoverlost
+                     :tooltip `${tooltip}`
+                     (box :orientation `v`
+                          :space-evenly false
+                          :class `${class} box`
+                          (revealer :transition `slideup`
+                                    :reveal reveal              
+                                    (scale :orientation `v`
+                                           :flipped true
+                                           :value value
+                                           :min 0
+                                           :max 101
+                                           :onchange `${onchange}`
+                                           :active true
+                                           )
+                                    )
+                          (button :class `${class} icon` :onclick onclick `${text}`)
+                          )
+                     )
+           )
+
+(defvar vol-rev false)
+(defpoll current-volume :interval `1s` :run-while vol-rev :initial `0` `wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print $2 * 100}'`)
+(defwidget vol []
+           (foo :class `volume-slider`
+                :reveal vol-rev
+                :onhover `${EWW_CMD} update vol-rev=true`
+                :onhoverlost `${EWW_CMD} update vol-rev=false`
+                :onclick `pavucontrol &`
+                :value current-volume
+                :text  `${current-volume >= 50 ? `` : current-volume > 20 ? '' : current-volume > 0? `󰩐` : ``}`
+                :onchange `wpctl set-volume @DEFAULT_AUDIO_SINK@ {}%`
+                :tooltip `volume ${current-volume}%`
+                )
+           )
+
+(defvar bright-rev false)
+(defpoll current-brightness :interval `1s` :initial `0` :run-while bright-rev `brightnessctl -m | awk -F, '{gsub(/%/, "", $4); print $4}'`)
+(defwidget bright []
+           (foo :class `brightness-slider`
+                :reveal bright-rev
+                :onhover `${EWW_CMD} update bright-rev=true`
+                :onhoverlost `${EWW_CMD} update bright-rev=false`
+                :value current-brightness
+                :text `${current-brightness > 75 ? '󰃠' : current-brightness > 50 ? '󰃟' : current-brightness > 25 ? '󰃝' : '󰃞'}`
+                :onchange `brightnessctl set {}%`
+                :tooltip `brightness ${current-brightness}%`
+                )
+           )
+
+(defwidget tux []
+           (eventbox :class `tux`
+                     :cursor `pointer`
+                     :onclick `pidof rofi >/dev/null 2>&1&& pkill rofi || rofi -show drun >/dev/null 2>&1 &`
+                     :onrightclick `pidof wofi >/dev/null  2>&1 && pkill wofi || wofi --show drun >/dev/null 2>&1 &`
+                     :tooltip `drun`
+                     ``
+                     )
+           )
+
+(defvar power-rev false)
+(defwidget power []
+           (eventbox :cursor `pointer`
+                     :class `power-container`
+                     :onhover `${EWW_CMD} update power-rev=true`
+                     :onhoverlost `${EWW_CMD} update power-rev=false`
+                     (box :class `power-box`
+                          :orientation `v`
+                          :space-evenly false
+                          (button :class `power-btn`
+                                  :onclick `systemctl poweroff`
+                                  :tooltip `Shut up, bitch`
+                                  `⏻`)
+                          (revealer :transition `slidedown`
+                                    :reveal power-rev
+                                    (box :orientation `v`
+                                         :space-evenly false
+                                         (button :class `reboot-btn`
+                                                 :onclick `systemctl reboot`
+                                                 :tooltip `Reboot`
+                                                 ``)
+                                         (button :class `lock-btn`
+                                                 :onclick `loginctl lock-session`
+                                                 :tooltip `lock`
+                                                 ``)
+                                         (button :class `sleep-btn`
+                                                 :onclick `systemctl suspend`
+                                                 :tooltip `sleep`
+                                                 `󰒲`)
+                                         (button :class `logout-btn`
+                                                 :onclick `loginctl terminate-user $USER`;`niri msg action quit`
+                                                 :tooltip `Logut`
+                                                 `󰿅`)
+                                         )
+                                    )
+                          )
+                     )
+           )
+
+(defvar apps-rev false)
+(defwidget apps []
+           (eventbox :cursor `pointer`
+                     :onhover `${EWW_CMD} update apps-rev=true`
+                     :onhoverlost `${EWW_CMD} update apps-rev=false`
+                     (box :class `apps-box`
+                          :orientation `v`
+                          :space-evenly false
+                          (button :class `minecraft`
+                                  :onclick `mcpelauncher-ui-qt >/dev/null 2>&1 &`
+                                  :onrightclick `minecraft-launcher >/dev/null 2>&1 &`
+                                  :tooltip `minecraft`
+                                  `󰍳`)
+                          (revealer :transition `slidedown`
+                                    :reveal apps-rev
+                                    (box :orientation `v`
+                                         :spacing 2
+                                         (button :class `steam`
+                                                 :onclick `steam >/dev/null 2>&1 &`
+                                                 :tooltip `steam`
+                                                 `󰓓`)
+                                         (button :class `discord`
+                                                 :onclick `discord >/dev/null 2>&1 &`
+                                                 :tooltip `discord`
+                                                 ``)
+                                         (button :class `google`
+                                                 :onclick `xdg-open https://google.com`
+                                                 :tooltip `google`
+                                                 `󰊭`)
+                                         (button :class `codeberg`
+                                                 :onclick `xdg-open https://codeberg.org/$(git config --get user.name)`
+                                                 :tooltip `codeberg`
+                                                 ``)
+                                         (button :class `gitlab`
+                                                 :onclick `xdg-open https://gitlab.com/$(git config --get user.name)`
+                                                 :tooltip `gitlab`
+                                                 `󰮠`)
+                                         (button :class `github`
+                                                 :onclick `xdg-open https://github.com/$(git config --get user.name)`
+                                                 :tooltip `github`
+                                                 `󰊤`
+                                                 )
+                                         )
+                                    )
+                          )
+                     )
+           )
+
+(defwidget clock []
+           (eventbox :class `clock-box`
+                     :cursor `pointer`
+                     :onclick `scripts/calendar.sh`
+                     (box :class `clock-container`
+                          :orientation `v`
+                          :spacing 2
+                          (label :class `hours` :text `${formattime(EWW_TIME, `%H`, `Asia/Jakarta`)}` :tooltip `HOURS`)
+                          (label :class `minutes` :text `${formattime(EWW_TIME, `%M`, `Asia/Jakarta`)}` :tooltip `MINUTES`)
+                          ;;(label :class `seconds` :text "${formattime(EWW_TIME, '%S', 'Asia/Jakarta')}" :tooltip `SECONDS`)
+                          )
+                     )
+           )
+
+(defwidget bar []
+           (centerbox :orientation `v`
+                      :class `vbar`
+                      (box :orientation `v`
+                           :space-evenly false
+                           :valign `start`
+                           (power)
+                           (apps))
+                      (box :orientation `v`
+                           :space-evenly false
+                           :valign `center`
+                           (clock))
+                      (box :orientation `v`
+                           :space-evenly false
+                           :valign `end`
+                           (bright)
+                           (vol)
+                           (tux))
+                      )
+           )
+(defwindow bar
+           :monitor 0
+           :stacking `fg`
+           :exclusive true
+           :namespace `bar`
+           ;; x11
+           ;:windowtype `normal`
+           ;:wm-ignore true
+           ;:reserve (struts :side `left` :distance `40px`)
+           :geometry (geometry :anchor `left center`
+                               :height `100%`
+                               :width `40px`
+                               ;:x '5px'
+                               )
+           (bar)
+           )
+
+(defwindow activatelinux
+           :monitor 0
+           :stacking `fg`
+           :geometry (geometry :x `32px`
+                               :y `32px`
+                               :anchor `bottom right`)
+           (box :orientation `v`
+                :class `activatelinux`
+                (label :xalign 0 :markup `<span font_size='large'>Activate Linux</span>`)
+                (label :xalign 0 :text `Go to Settings to activate Linux`))
+           )
+
+
+
+(defvar cal-rev false)
+(defwindow calendar
+           :monitor 0
+           :stacking `overlay`
+           :namespace `calendar`
+           :geometry (geometry :anchor `center left`
+                               :width `250px`
+                               :height `10px`
+                               :x `5px`
+                               )
+           (revealer :transition `slideright`
+                     :reveal cal-rev
+                     :duration `350ms`
+                     (eventbox :onhoverlost `scripts/calendar.sh`
+                               (box :class `calendar-container`
+                                    :orientation `v`
+                                    :spacing 2
+                                    :space-evenly false
+                                    (box :class `date` `${formattime(EWW_TIME , `%D`, `Asia/Jakarta`)}`)
+                                    (calendar :class `cal` :show-week-numbers false)
+                                    )
+                               )
+                     )
+           )
+
+;; vim: ft=lisp:nowrap

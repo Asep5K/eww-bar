@@ -1,4 +1,6 @@
 #!/bin/bash
+eww="eww -c ${XDG_CONFIG_HOME:-$HOME/.config}/eww/bar"
+
 set_layer_rule() {
     local namespace="$1" animation="$2"
     hyprctl eval "hl.layer_rule({
@@ -10,10 +12,10 @@ set_layer_rule() {
 }
 
 set_layer_rule "nexus-win" "slide"
-if [[ "$(eww get nexus_rev)" == "true" ]]; then
-    eww update nexus_rev=false
-    eww close nexus_win
+if [[ "$($eww get nexus_rev)" == "true" ]]; then
+    $eww update nexus_rev=false
+    $eww close nexus_win
 else
-    eww update nexus_rev=true
-    eww open nexus_win
+    $eww update nexus_rev=true
+    $eww open nexus_win
 fi

@@ -1,0 +1,143 @@
+$fontsize: 30px;
+
+// color is bloat
+$bg-color: #1a1a1a;
+$fg-color: #d9d9d9;
+$dim-color: #666666;
+$border-color: #333333;
+
+* {
+    all: unset;
+    font-family: "JetBrainsMonoNL Nerd Font Mono";
+
+    trough {
+        min-height: 80px;
+        min-width: 10px;
+        background-color: rgba($fg-color, 0.1);
+        border-radius: 10px;
+
+        highlight {
+            background-color: $fg-color;
+            border-radius: 5px;
+        }
+    }
+}
+
+.vbar {
+    background-color: rgba($bg-color, 0.85);
+}
+
+.tux {
+    color: $dim-color;
+    font-size: $fontsize;
+
+    &:hover {
+        color: $fg-color;
+    }
+}
+
+.volume-slider,
+.brightness-slider {
+    .icon {
+        font-size: $fontsize;
+        color: $dim-color;
+    }
+
+    &:hover .icon {
+        color: $fg-color;
+    }
+}
+
+.apps-box,
+.power-box {
+    label {
+        font-size: $fontsize;
+        color: $dim-color;
+    }
+
+    *:hover label {
+        color: $fg-color;
+    }
+}
+
+.clock-box {
+    label {
+        color: $dim-color;
+        font-family: "Monocraft Nerd Font";
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    &:hover label {
+        color: $fg-color;
+    }
+}
+
+
+.activatelinux {
+    color: rgba($fg-color, 0.6);
+
+    label {
+        font-family: initial;
+        font-size: 15px;
+        font-weight: normal;
+    }
+
+    &.background {
+        background: none;
+    }
+}
+
+.calendar-container {
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    background-color: rgba($bg-color, 0.7);
+    border-radius: 10px;
+    border: 2px solid $border-color;
+    padding: 10px;
+
+    .date {
+        color: $fg-color;
+        border-radius: 10px;
+        border: 2px solid $border-color;
+    }
+
+    .cal {
+        padding: 5px;
+        color: $fg-color;
+
+        &.header,
+        &.button,
+        &.highlight {
+            color: $fg-color;
+        }
+
+        &:indeterminate {
+            color: $dim-color;
+        }
+
+        &:selected {
+            color: rgba(205, 212, 246, 0.4);
+        }
+
+    }
+}
+
+/*
+.notifications {
+    min-height: 0px;
+    background-color: transparent;
+}
+
+.notif {
+    background-color: #282828;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border-width: 2;
+    border-color: #fabd2f;
+}
+
+.notif image {
+    padding-right: 10px;
+}
+*/

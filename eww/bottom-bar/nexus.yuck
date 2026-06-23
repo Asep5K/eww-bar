@@ -1,10 +1,9 @@
-(include "sysinfo/eww.yuck")
 (defvar nexus_rev false)
 (defpoll current_volume :interval "1s" :initial "0" :run-while is_nexus_open `wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print $2 * 100}'`)
 (defpoll current_brightness :interval "1s" :initial "0" :run-while is_nexus_open `brightnessctl -m | awk -F, '{gsub(/%/, \"\", $4); print $4}'`)
 (defpoll daytime :interval "1s" :run-while is_nexus_open `date '+%H:%M:%S %d.%m.%Y, %A'`)
-(deflisten musica :initial "{}" :run-while is_nexus_open `nexus/scripts/music.sh a`)
-(deflisten musicb :initial "{}" :run-while is_nexus_open `nexus/scripts/music.sh b`)
+(deflisten musica :initial "{}" :run-while is_nexus_open `scripts/music.sh a`)
+(deflisten musicb :initial "{}" :run-while is_nexus_open `scripts/music.sh b`)
 
 (defwidget btn [icon ?class tooltip onclick]
            (eventbox :class "btn-container"
@@ -17,11 +16,11 @@
 
 
 (defwidget decor []
-        (box :orientation "h" 
-             :class "decoration" 
-             :halign "end"
-             (btn :icon "󱄊" :class "close-btn" :tooltip "close" :onclick "${EWW_CMD} update nexus_rev=false")
-           ))
+           (box :orientation "h" 
+                :class "decoration" 
+                :halign "end"
+                (btn :icon "󱄊" :class "close-btn" :tooltip "close" :onclick "${EWW_CMD} update nexus_rev=false")
+                ))
 
 (defwidget clock []
            (box :class "daytime-container"
@@ -129,13 +128,71 @@
            )
 
 
+(defwidget sysinfo []
+           (box :class "sysinfo"
+                :orientation "h"
+                :space-evenly false
+                :halign "center"
+                     (ram_box)
+                     (cpu_box)
+                     (disk_box)
+                )
+           )
+
+
+(defwidget foo_box [cclass value label1 label2 lclass]
+           (box :class "foo-box"
+                :orientation "v"
+                :space-evenly false
+                :spacing 7
+                (circular-progress :class cclass
+                                   :value value
+                                   :thickness 5
+                                   :start-at 75
+                                   :width 80
+                                   :height 80
+                                   (label :text label1 :xalign 0.5 :yalign 0.5)
+                                   )
+                (label :text label2 :class lclass)
+                )
+           )
+
+(defwidget ram_box []
+           (foo_box 
+             :cclass "ram-perc" 
+             :value "${EWW_RAM.used_mem_perc}" 
+             :label1 " " 
+             :label2 "RAM ${round(EWW_RAM.used_mem_perc,0)}%" 
+             :lclass "ram-usage"
+             )
+           )
+
+(defwidget cpu_box []
+           (foo_box
+             :cclass "cpu-perc"
+             :value "${EWW_CPU.avg}"
+             :label1 " "
+             :label2 "CPU ${round(EWW_CPU.avg,0)}%"
+             :lclass "cpu-avg"
+             )
+           )
+
+(defwidget disk_box []
+            (foo_box
+              :cclass "disk"
+              :value "${EWW_DISK["/"].used_perc}"
+              :label1 " "
+              :label2 "DISK ${round(EWW_DISK["/"].used_perc,0)}%"
+              :lclass "disk-perc"
+              )
+           )
+
 (defwidget nexus_main []
            (box :valign "end"
                 :class "nexus-container"
                 :orientation "v"
                 :space-evenly false
                 :spacing 5
-                ;(decor)
                 (clock)
                 (sysinfo)
                 (music_player)
@@ -159,7 +216,9 @@
                 (revealer :transition "slideleft"
                           :reveal nexus_rev
                           :duration "350ms"
-                          (nexus_main)
+                          (eventbox :onhoverlost "scripts/nexus.sh"
+                                    (nexus_main)
+                                    )
                           )
                 )
            )
@@ -168,7 +227,7 @@
            (eventbox :class "nexus"
                      :cursor "pointer"
                      ;:onclick "${nexus_rev == false ? "${EWW_CMD} open nexus_win && ${EWW_CMD} update nexus_rev=true": "${EWW_CMD} update nexus_rev=false ; ${EWW_CMD} close nexus_win"}"
-                     :onclick "nexus/scripts/nexus.sh"
+                     :onclick "scripts/nexus.sh"
                      (label :text " ")
                      )
            )

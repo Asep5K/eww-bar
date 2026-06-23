@@ -1,0 +1,151 @@
+(include "nexus.yuck")
+
+(defvar out "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png")
+(defwidget screenshot []
+           (eventbox :class "screenshot"
+                     :onclick "grimblast --notify copysave screen ${out} &"
+                     :onrightclick "grimblast --notify copysave area ${out} &"
+                     :cursor "pointer"
+                     :tooltip "Right: screen | Left: area"
+                     "󰄄 "
+                     )
+           )
+
+(defwidget tray []
+           (systray
+             :spacing 10
+             :orientation "h"
+             :space-evenly false
+             :icon-size 20
+             :prepend-new true
+             )
+           )
+
+(defwidget temp [] ;ek
+           (box :class "temp"
+                :orientation "h"
+                (label :text "" :class "temp-icon")
+                (label :text "${EWW_TEMPS.CORETEMP_PACKAGE_ID_0}󰔄"
+                       :class "tempr ${EWW_TEMPS.CORETEMP_PACKAGE_ID_0 >= 70  ? "panas-goblok" : "adem-ayem"}"
+                       )
+                )
+           )
+
+;; rofi menu
+(defwidget menu []
+           (eventbox :class "arch-btw"
+                     :onclick "rofi -show drun &"
+                     :cursor "pointer"
+                     :tooltip "dmenu"
+                     (label :text "󰣇 " )
+                     )
+           )
+
+(defvar opacity 100)
+(defvar opacityrev false)
+(defwidget opasiti-slider []
+           (eventbox :cursor "pointer"
+                     :onhover "${EWW_CMD} update opacityrev=true"
+                     :onhoverlost "${EWW_CMD} update opacityrev=false"
+                     (box :orientation "h"
+                          :space-evenly false
+                          (label :text "󰗌 " :class "opacity-icon")
+                          (revealer :transition "slideright"
+                                    :reveal opacityrev
+                                    (scale :class "opacity-slider"
+                                           :value opacity
+                                           :min 1
+                                           :max 101
+                                           :onchange "${EWW_CMD} update opacity={} && scripts/opacity.sh {}"
+                                           :active true
+                                           )
+                                    )
+                          )
+                     )
+           )
+
+(defvar img_path "../../hypr/wallpaper/1.jpg")
+(defvar workspacerev false)
+(defvar active_workspace 1)
+(defvar nums `[1,2,3,4,5,6]`)
+;(deflisten active_workspace :initial 1 `socat -u UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock - | stdbuf -o0 awk -F '>>|,' '/^workspace>>/{print $2}'4`)
+(defwidget workspaces []
+           (box :class "workspace-container"
+                :spacing 10
+                (for num in nums
+                     (eventbox :cursor "pointer"
+                               :onscroll "if [ '{}' = 'up' ]; then hyprctl dispatch 'hl.dsp.focus({ workspace = \"r-1\" })'; else hyprctl dispatch 'hl.dsp.focus({ workspace = \"r+1\" })'; fi"
+                               :onclick "hyprctl dispatch 'hl.dsp.focus({ workspace = ${num} })'"
+                               :onrightclick "hyprctl dispatch 'hl.dsp.window.move({ workspace = ${num} })'"
+                               :onhover "${EWW_CMD} update workspacerev=true && scripts/hover.sh ${num}"
+                               :onhoverlost "${EWW_CMD} update workspacerev=false"
+                               :timeout "500ms"
+                               (box :class "workspace-button"
+                                    :spacing 5
+                                    :space-evenly false
+                                    (label :text "${active_workspace == num ? " ": " "}"
+                                           :class "${active_workspace == num ? "active": ""}")
+                                    )
+                               )
+                     )
+                )
+           )
+
+(defwindow workspace_hover
+           :monitor 0
+           :namespace "workspace"
+           :stacking "overlay"
+           :geometry (geometry :anchor "bottom center"
+                               :y "5px"
+                               ;:width "200px"
+                               ;:height "120px"
+                               )
+           (revealer :transition "slideup"
+                     :reveal workspacerev
+                     :duration "250ms"
+                     (box :class "workspace-img" :orientation "v"
+                          :style "background-image: url('${img_path}')"
+                          )
+                     )
+           )
+
+(defwidget foo-bar [h]
+           (box :orientation "h"
+                :halign h
+                :valign "center"
+                :spacing 10
+                :hexpand true
+                :space-evenly false
+                (children)
+                )
+           )
+
+(defwidget bar []
+           (box :class "bar"
+                :orientation "h"
+                (foo-bar :h "start"
+                         (menu)
+                         (opasiti-slider))
+                (foo-bar :h "center"
+                         (workspaces))
+                (foo-bar :h "end"
+                         (tray)
+                         (screenshot)
+                         (temp)
+                         (nexus))
+                )
+           )
+
+(defwindow bar
+           :monitor 0
+           :namespace "bottom-bar"
+           :exclusive true
+           :stacking "fg"
+           :geometry (geometry :anchor "bottom center"
+                               :width "99.5%"
+                               :height "3.80%"
+                               )
+           (bar)
+           )
+
+;; vim: ft=lisp:nowrap
